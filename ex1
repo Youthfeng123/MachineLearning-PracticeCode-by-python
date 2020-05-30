@@ -1,0 +1,73 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def ComputCost(x,y,theta):
+    inner=np.power(x*theta.T-y,2)   #计算预测函数对于每一个样本的方差值
+    return np.sum(inner)/(2*len(x))   #累加并除去2m
+
+
+
+A=np.eye(5)  #生成一个五阶单位矩阵
+print(A)
+#载入数据
+path='D:/MLpractice/ex1/ex1data1.txt'
+data=pd.read_csv(path,header=None,names=['Population','Profit'])   #生成数据表格
+#print(data.head())#显示前几项
+
+#显示数据
+# data.plot(kind='scatter', x='Population', y='Profit', figsize=(12,8))
+# plt.show()
+
+
+data.insert(0,'Ones',1)   #加入一列x用于更新theta  theta初始化是0
+#print(data.head())
+
+#初始化x和y  但代码想表达什么？
+
+cols=data.shape[1]
+X=data.iloc[:,:-1]
+Y=data.iloc[:,cols-1:cols]
+
+print(X.head())
+print(Y.head())
+#把数据矩阵化
+x=np.matrix(X.values)
+y=np.matrix(Y.values)
+theta=np.matrix(np.array([0,0]))
+
+
+#查看矩阵的维度
+print(x.shape)  #97*2   分别是x0和x1
+print(y.shape)  #97*1
+print(theta.shape)  #1*2
+
+
+print(ComputCost(x,y,theta))
+
+#开始梯度下降
+
+def GradientDecent(X,Y,theta,alpha,iters):
+    temp=np.matrix(np.zeros(theta.shape))
+    parameters=int(theta.ravel().shape[1])
+    cost=np.zeros(iters)
+
+    for i in range(iters):
+        error=(X*theta.T)-y
+
+        for j in range(parameters):
+            term=np.multiply(error,X[:,j])
+            temp[0,j]=theta[0,j]-((alpha/len(X))*np.sum(term))
+
+        theta=temp
+        cost[i]=ComputCost(X,y,theta)
+
+    return theta,cost
+
+
+alpha=0.01
+iters=1500
+
+g,cost=GradientDecent(x,y,theta,alpha,iters)
+
+print(g)
